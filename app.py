@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Load the model once when the app starts
-model_path = os.environ.get("MODEL_PATH", "model/yolov8m.xml")
+model_path = os.path.join("model", "yolov8m_openvino_int8_model", "yolov8m.xml")
 detector = Detector(model_path=model_path, input_size=(640, 640))
 
 @app.route("/")

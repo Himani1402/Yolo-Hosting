@@ -16,7 +16,10 @@ async def run_detection(request: DetectionRequest):
     try:
         # Instantiate the Detector with the model path and input size
         detector = Detector(model_path=request.model_path, input_size=request.input_size)
+
+        # Run the detector (assuming this doesn't block the main thread too much)
         detector.run()
+
         return {"message": "Detection run successfully", "status": "success"}
     except Exception as e:
         return {"message": str(e), "status": "error"}

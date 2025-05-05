@@ -7,7 +7,7 @@ from detection_pipeline.detector import Detector  # Import your real detector
 app = Flask(__name__)
 
 # Initialize the real detector (adjust path to your model .xml)
-detector = Detector(model_path="yolo_model/yolov8m_openvino_int8_model/yolov8.xml")  # Replace with correct model path
+detector = Detector(model_path="model/yolov8m_openvino_int8_model/yolov8.xml")  # Replace with correct model path
 
 # Allowed video extensions
 ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'mkv'}

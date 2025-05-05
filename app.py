@@ -35,6 +35,7 @@ def detect():
         file.save(filepath)
 
         # Step 3: Run detection
+        # Pass the file path to the detector
         results = detector.run(filepath)
 
         # Step 4: Return results
@@ -42,3 +43,6 @@ def detect():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=8080)  # Update the port to 8080

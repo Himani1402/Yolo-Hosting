@@ -1,30 +1,31 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+import uvicorn
+import numpy as np
+import cv2
 from detection_pipeline.detector import Detector
 
-# Initialize FastAPI app
 app = FastAPI()
 
-# Define a Pydantic model for the input data
-class DetectionRequest(BaseModel):
-    model_path: str
-    input_size: tuple
+# Initialize the detector once
+model_path = "model\yolov8m_openvino_int8_model\yolov8m.xml"
+detector = Detector(model_path=model_path, input_size=(640, 640))
 
-# Define a POST endpoint to trigger the detection
-@app.post("/run-detection")
-async def run_detection(request: DetectionRequest):
-    try:
-        # Instantiate the Detector with the model path and input size
-        detector = Detector(model_path=request.model_path, input_size=request.input_size)
+@app.post("/detect/")
+async def detect(file: UploadFile = File(...)):
+    # Read uploaded image
+    contents = await file.read()
+    nparr = np.frombuffer(contents, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        # Run the detector (assuming this doesn't block the main thread too much)
-        detector.run()
+    if img is None:
+        return JSONResponse(content={"error": "Invalid image"}, status_code=400)
 
-        return {"message": "Detection run successfully", "status": "success"}
-    except Exception as e:
-        return {"message": str(e), "status": "error"}
+    # Run detection
+    results = detector.run(img)  # Assuming detector.run() can accept an image
 
-# Main function to test locally
+    # Return detection results
+    return {"detections": results}
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("your_fastapi_file_name:app", host="0.0.0.0", port=8000, reload=True)
